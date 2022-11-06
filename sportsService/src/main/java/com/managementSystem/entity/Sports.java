@@ -1,6 +1,6 @@
 package com.managementSystem.entity;
 
-import com.managementSystem.createRequest.CreateSport;
+import com.managementSystem.request.CreateSport;
 
 import javax.persistence.*;
 

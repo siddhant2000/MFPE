@@ -1,6 +1,6 @@
 package com.managementSystem.service;
 
-import com.managementSystem.createRequest.CreateEvent;
+import com.managementSystem.request.CreateEvent;
 import com.managementSystem.entity.Event;
 import com.managementSystem.exception.ResourceNotFoundException;
 import com.managementSystem.repository.EventRepo;
@@ -39,7 +39,7 @@ public class EventService {
             return event.getEventName()+" deleted successfully";
         }
         else{
-            return "no event with the event Id: " + eventId;
+            throw new ResourceNotFoundException("no event with the event Id: " + eventId);
         }
     }
 

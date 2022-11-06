@@ -1,6 +1,6 @@
 package com.managementSystem.entity;
 
-import com.managementSystem.createPlayer.CreatePlayer;
+import com.managementSystem.request.CreatePlayer;
 
 import javax.persistence.*;
 

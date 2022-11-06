@@ -133,18 +133,18 @@ public class ParticipationService {
         return participationRepo.findAll();
     }
 
-    public Participation updateStatus(Long participationId, ParticipationResponse participationResponse) {
+    public ResponseEntity<Participation> updateStatus(Long participationId, ParticipationResponse participationResponse) {
 
-        if(participationRepo.findById(participationId).isPresent()) {
+            if(participationRepo.findById(participationId).isPresent()) {
 
 
-            Participation participation = participationRepo.findById(participationId).get();
+                Participation participation = participationRepo.findById(participationId).get();
 
-            participation.setStatus(participationResponse.getStatus());
-            final Participation updatedParticipation = participationRepo.save(participation);
-            return updatedParticipation;
-        }
-        throw new ResourseNotFoundException("Does not exist");
+                participation.setStatus(participationResponse.getStatus());
+                final Participation updatedParticipation = participationRepo.save(participation);
+                return ResponseEntity.ok(updatedParticipation);
+            }
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
     public ResponseEntity<List<Participation>> getParticipationStatus(String status) {

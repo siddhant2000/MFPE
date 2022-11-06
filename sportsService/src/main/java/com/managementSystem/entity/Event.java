@@ -2,7 +2,7 @@ package com.managementSystem.entity;
 
 
 
-import com.managementSystem.createRequest.CreateEvent;
+import com.managementSystem.request.CreateEvent;
 
 import javax.persistence.*;
 

@@ -1,12 +1,10 @@
 package com.managementSystem.service;
 
-import com.managementSystem.Response.SportResponse;
-import com.managementSystem.createRequest.CreateSport;
+import com.managementSystem.request.CreateSport;
 import com.managementSystem.entity.Sports;
 import com.managementSystem.exception.ResourceNotFoundException;
 import com.managementSystem.repository.SportsRepo;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

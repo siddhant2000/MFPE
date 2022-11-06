@@ -21,7 +21,6 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
-@CrossOrigin("*")
 @RestController
 @RequestMapping(value = "/participation")
 public class ParticipationController {
@@ -29,6 +28,76 @@ public class ParticipationController {
     @Autowired
     private ParticipationService service;
 
+//  USING openFeign client to call other microservices
+    @Autowired
+    private PlayerClient playerClient;
+    @Autowired
+    private SportClient sportClient;
+    @Autowired
+    private EventClient eventClient;
+
+    @PostMapping("/addparticipation")
+    public ParticipationResponse addParticipation(@RequestBody CreateParticipation createParticipation){
+        Long  playerId =createParticipation.getPlayer_id();
+        String  eventName = createParticipation.getEvent_name();
+        String  sportName = createParticipation.getSports_name();
+
+//      Getting player model by calling player microservice
+        PlayerResponse playerResponse = playerClient.getPlayerById(playerId);
+        String playerName = playerResponse.getPlayerName();
+
+//      Getting sport model by calling Sport-Event Microservice
+        SportResponse sportResponse = sportClient.getSportsByName(sportName);
+        Long sportId = sportResponse.getSportsId();
+
+//      Getting Event model by calling sport-Event Microservice microservice
+        EventResponse eventResponse = eventClient.getEventByName(eventName);
+        Long eventId = eventResponse.getEventId();
+
+
+        createParticipation.setPlayer_name(playerName);
+        createParticipation.setSports_id(sportId);
+        createParticipation.setEvent_id(eventId);
+
+        Participation participation =service.addParticipation(createParticipation);
+        return new ParticipationResponse(participation);
+    }
+
+
+    @GetMapping("/getParticipations")
+    public ResponseEntity<List<Participation>> getAllParticipation(){
+        List<Participation> list =service.getAllParticipation();
+        if(list.size()>0){
+            return ResponseEntity.ok(list);
+        }
+        throw new ResourseNotFoundException("Empty");
+    }
+
+    @PutMapping("/updateStatus")
+    public ResponseEntity<Participation> updateStatus(@RequestBody ParticipationResponse participationResponse){
+        Long participationId = participationResponse.getParticipation_id();
+       return service.updateStatus(participationId,participationResponse);
+
+    }
+
+    @GetMapping("/getApprovedParticipations/{approved}")
+    public ResponseEntity<List<Participation>> getApprovedParticipations(@PathVariable("approved")String approvedStatus){
+        return  service.getParticipationStatus(approvedStatus);
+    }
+
+    @GetMapping("/getDeclinedParticipations/{declined}")
+    public  ResponseEntity<List<Participation>> getDeclinedParticipations(@PathVariable("declined")String declinedStatus){
+        return service.getParticipationStatus(declinedStatus);
+    }
+
+    @GetMapping("/getPendingParticipations/{pending}")
+    public  ResponseEntity<List<Participation>> getPendingParticipations(@PathVariable("pending")String pendingStatus){
+        return  service.getParticipationStatus(pendingStatus);
+    }
+
+
+//              Used WebClient To call other microservices
+//
 //    @PostMapping("/addparticipation")
 //    public ParticipationResponse addParticipation(@RequestBody CreateParticipation createParticipation){
 //        /////////////////////////
@@ -101,104 +170,6 @@ public class ParticipationController {
 //
 //        return eventResponse.block();
 //    }
-
-
-
-
-
-
     ////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-
-    @GetMapping("/getParticipations")
-    public ResponseEntity<List<Participation>> getAllParticipation(){
-        List<Participation> list =service.getAllParticipation();
-        if(list.size()>0){
-            return ResponseEntity.ok(list);
-        }
-        throw new ResourseNotFoundException("Empty");
-//        return  ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-    }
-    @PutMapping("/updateStatus")
-    public Participation updateStatus(@RequestBody ParticipationResponse participationResponse){
-        Long participationId = participationResponse.getParticipation_id();
-       return service.updateStatus(participationId,participationResponse);
-
-    }
-    
-
-    @GetMapping("/getApprovedParticipations/{approved}")
-    public ResponseEntity<List<Participation>> getApprovedParticipations(@PathVariable("approved")String approvedStatus){
-        return  service.getParticipationStatus(approvedStatus);
-    }
-
-    @GetMapping("/getDeclinedParticipations/{declined}")
-    public  ResponseEntity<List<Participation>> getDeclinedParticipations(@PathVariable("declined")String declinedStatus){
-        return service.getParticipationStatus(declinedStatus);
-    }
-
-    @GetMapping("/getPendingParticipations/{pending}")
-    public  ResponseEntity<List<Participation>> getPendingParticipations(@PathVariable("pending")String pendingStatus){
-        return  service.getParticipationStatus(pendingStatus);
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    ////////////////////////////////////////////////////////////////////////
-    @Autowired
-    private PlayerClient playerClient;
-    @Autowired
-    private SportClient sportClient;
-    @Autowired
-    private EventClient eventClient;
-
-    @PostMapping("/addparticipation")
-    public ParticipationResponse addParticipation(@RequestBody CreateParticipation createParticipation){
-        /////////////////////////
-        Long  playerId =createParticipation.getPlayer_id();
-        String  eventName = createParticipation.getEvent_name();
-        String  sportName = createParticipation.getSports_name();
-
-//        PlayerResponse playerResponse = getPlayer(playerId);
-
-        ///
-        PlayerResponse playerResponse = playerClient.getPlayerById(playerId);
-
-        String playerName = playerResponse.getPlayerName();
-
-//        SportResponse sportResponse = getSportService(sportName);
-        SportResponse sportResponse = sportClient.getSportsByName(sportName);
-        Long sportId = sportResponse.getSportsId();
-
-//        EventResponse eventResponse = getEventService(eventName);
-        EventResponse eventResponse = eventClient.getEventByName(eventName);
-        Long eventId = eventResponse.getEventId();
-
-
-
-
-        createParticipation.setPlayer_name(playerName);
-        createParticipation.setSports_id(sportId);
-        createParticipation.setEvent_id(eventId);
-
-        Participation participation =service.addParticipation(createParticipation);
-        return new ParticipationResponse(participation);
-    }
-
-
-
-
 
 }
